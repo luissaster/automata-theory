@@ -27,5 +27,5 @@ Este projeto é desenvolvido para a disciplina SIN 131 - Introdução à Teoria 
     python main.py
 ### Autores
 - Luís Fernando Almeida - luisfernalme@gmail.com
-- 
+- Pedro Augusto Simões da Cruz
 
