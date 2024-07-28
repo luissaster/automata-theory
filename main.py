@@ -33,7 +33,7 @@ class Automaton:
     
     def convert_to_dfa(self):
         if self.is_dfa:
-            return self  # If it's already a DFA, return itself
+            return self
 
         # Initialize DFA components
         dfa_states = []
@@ -81,6 +81,65 @@ class Automaton:
             final_states=list(dfa_final_states_named),
             is_dfa=True
         )
+    
+    def minimize_dfa(self):
+        if not self.is_dfa:
+            raise ValueError("Minimization can only be applied to DFA.")
+
+        # Step 1: Remove unreachable states
+        reachable_states = {self.initial_state}
+        queue = [self.initial_state]
+        
+        while queue:
+            state = queue.pop(0)
+            for symbol in self.alphabet:
+                next_state = self.transitions[state][symbol]
+                if next_state not in reachable_states:
+                    reachable_states.add(next_state)
+                    queue.append(next_state)
+        
+        self.states = list(reachable_states)
+        self.transitions = {state: trans for state, trans in self.transitions.items() if state in reachable_states}
+        self.final_states = [state for state in self.final_states if state in reachable_states]
+
+        # Step 2: Distinguish states using the Myhill-Nerode theorem
+        partition = [set(self.final_states), set(self.states) - set(self.final_states)]
+        
+        while True:
+            new_partition = []
+            for group in partition:
+                grouped_states = {}
+                for state in group:
+                    signature = tuple(sorted([(symbol, self.transitions[state][symbol]) for symbol in self.alphabet]))
+                    if signature not in grouped_states:
+                        grouped_states[signature] = set()
+                    grouped_states[signature].add(state)
+                new_partition.extend(grouped_states.values())
+            if len(new_partition) == len(partition):
+                break
+            partition = new_partition
+        
+        # Step 3: Create the new minimized DFA
+        state_map = {state: idx for idx, group in enumerate(partition) for state in group}
+        minimized_states = [str(idx) for idx in range(len(partition))]
+        minimized_transitions = {str(idx): {} for idx in range(len(partition))}
+        minimized_final_states = {str(state_map[state]) for state in self.final_states}
+        minimized_initial_state = str(state_map[self.initial_state])
+        
+        for group in partition:
+            representative = next(iter(group))
+            for symbol in self.alphabet:
+                next_state = self.transitions[representative][symbol]
+                minimized_transitions[str(state_map[representative])][symbol] = str(state_map[next_state])
+
+        return Automaton(
+            states=minimized_states,
+            alphabet=self.alphabet,
+            transitions=minimized_transitions,
+            initial_state=minimized_initial_state,
+            final_states=list(minimized_final_states),
+            is_dfa=True
+        )
 
 def input_automaton():
     states = input("Enter the states separated by comma: ").split(",")
@@ -126,7 +185,6 @@ def generate_automaton_image(automaton_instance, image_name="automaton_image", i
     output_dir = "img"
     os.makedirs(output_dir, exist_ok=True)
     
-    # For some reason it's generating a extra file with no extension, no idea why, no time to fix it
     output_path = dot.render(filename=os.path.join(output_dir, image_name), format=image_format, view=True)
     print(f"Graph saved as {output_path}")
 
@@ -148,7 +206,7 @@ def check_equivalence(automaton1, automaton2):
                 return False
     return True
 
-def generate_txt_report(automaton1, automaton2, filename="report_automaton.txt"):
+def generate_txt_report(automaton1, automaton2, minimized_automaton, filename="report_automaton.txt"):
     with open(filename, 'w') as file:
         file.write("Automaton 1:\n")
         file.write(f"States: {', '.join(automaton1.states)}\n")
@@ -170,23 +228,37 @@ def generate_txt_report(automaton1, automaton2, filename="report_automaton.txt")
                 next_states = automaton2.get_next_states(state, symbol)
                 file.write(f"  {state} --{symbol}--> {', '.join(next_states)}\n")
         file.write(f"Initial State: {automaton2.initial_state}\n")
-        file.write(f"Final States: {', '.join(automaton2.final_states)}\n")
+        file.write(f"Final States: {', '.join(automaton2.final_states)}\n\n")
+
+        file.write("Minimized Automaton:\n")
+        file.write(f"States: {', '.join(minimized_automaton.states)}\n")
+        file.write(f"Alphabet: {', '.join(minimized_automaton.alphabet)}\n")
+        file.write("Transitions:\n")
+        for state in minimized_automaton.states:
+            for symbol in minimized_automaton.alphabet:
+                next_states = minimized_automaton.get_next_states(state, symbol)
+                file.write(f"  {state} --{symbol}--> {', '.join(next_states)}\n")
+        file.write(f"Initial State: {minimized_automaton.initial_state}\n")
+        file.write(f"Final States: {', '.join(minimized_automaton.final_states)}\n")
 
 def main():
     automaton_instance = None
     converted_automaton = None
+    minimized_automaton = None
 
     while True:
-        print("\nMenu:")
+        print("\nMenu:\n")
         print("1. Inserir automato")
         print("2. Visualizar automato (print e criar imagem)")
         print("3. Converter automato")
         print("4. Visualizar automato convertido (print e criar imagem)")
-        print("5. Simular aceitação de palavra no automato inserido")
-        print("6. Simular aceitação de palavra no automato convertido")
-        print("7. Checar equivalencia entre os automatos")
-        print("8. Gerar arquivo txt com os dois automatos")
-        print("9. Sair")
+        print("5. Minimizar AFD")
+        print("6. Visualizar AFD minimizado (print e criar imagem)")
+        print("7. Simular aceitação de palavra no automato inserido")
+        print("8. Simular aceitação de palavra no automato convertido")
+        print("9. Checar equivalencia entre os automatos")
+        print("10. Gerar arquivo .txt com os automatos")
+        print("\n0. Sair")
         option = input("Escolha uma opção: ")
 
         if option == "1":
@@ -210,6 +282,18 @@ def main():
             else:
                 print("Automato convertido não disponível.")
         elif option == "5":
+            if converted_automaton:
+                minimized_automaton = converted_automaton.minimize_dfa()
+                print("AFD minimizado com sucesso.")
+            else:
+                print("Automato convertido não disponível.")
+        elif option == "6":
+            if minimized_automaton:
+                print_automaton(minimized_automaton)
+                generate_automaton_image(minimized_automaton, image_name="minimized_automaton", image_format="png")
+            else:
+                print("AFD minimizado não disponível.")
+        elif option == "7":
             if automaton_instance:
                 word = input("Digite a palavra a ser simulada: ")
                 if simulate_word(automaton_instance, word):
@@ -218,7 +302,7 @@ def main():
                     print("Palavra não aceita pelo automato inserido.")
             else:
                 print("Automato não inserido.")
-        elif option == "6":
+        elif option == "8":
             if converted_automaton:
                 word = input("Digite a palavra a ser simulada: ")
                 if simulate_word(converted_automaton, word):
@@ -227,7 +311,7 @@ def main():
                     print("Palavra não aceita pelo automato convertido.")
             else:
                 print("Automato convertido não disponível.")
-        elif option == "7":
+        elif option == "9":
             if automaton_instance and converted_automaton:
                 if check_equivalence(automaton_instance, converted_automaton):
                     print("Os automatos são equivalentes.")
@@ -235,13 +319,13 @@ def main():
                     print("Os automatos não são equivalentes.")
             else:
                 print("Automato inserido ou convertido não disponível.")
-        elif option == "8":
-            if automaton_instance and converted_automaton:
-                generate_txt_report(automaton_instance, converted_automaton)
+        elif option == "10":
+            if automaton_instance and converted_automaton and minimized_automaton:
+                generate_txt_report(automaton_instance, converted_automaton, minimized_automaton)
                 print("Relatório gerado com sucesso.")
             else:
-                print("Automato inserido ou convertido não disponível.")
-        elif option == "9":
+                print("Automato inserido, convertido ou minimizado não disponível.")
+        elif option == "0":
             print("Saindo...")
             break
         else:
