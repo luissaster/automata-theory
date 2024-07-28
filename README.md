@@ -10,7 +10,8 @@ Este projeto é desenvolvido para a disciplina SIN 131 - Introdução à Teoria 
 
 - **`main.py`**: Contém o código principal do programa e o menu de interação.
 - **`automaton.py`**: Contém a definição da classe `Automaton` e métodos como conversão e minimização.
-- **`interface.py`**: Contém funções relacionadas à interface do usuário, como entrada de dados, visualização e geração de imagens.
+- **`interface.py`**: Contém funções relacionadas à interface do usuário.
+- **`misc.py`**: Contém funções que auxiliam na execução do programa.
 
 ### Requisitos
 
