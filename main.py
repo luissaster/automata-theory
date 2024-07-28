@@ -126,6 +126,7 @@ def generate_automaton_image(automaton_instance, image_name="automaton_image", i
     output_dir = "img"
     os.makedirs(output_dir, exist_ok=True)
     
+    # For some reason it's generating a extra file with no extension, no idea why, no time to fix it
     output_path = dot.render(filename=os.path.join(output_dir, image_name), format=image_format, view=True)
     print(f"Graph saved as {output_path}")
 
