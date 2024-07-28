@@ -17,9 +17,6 @@ class Automaton:
         return next_states
     
     def convert_to_dfa(self):
-        if self.is_dfa:
-            return self
-
         # Initialize DFA components
         dfa_states = []
         dfa_transitions = {}
