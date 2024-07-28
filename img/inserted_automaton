@@ -1,0 +1,14 @@
+digraph {
+	q1 [label=q1]
+	q1 -> q2 [label=a]
+	q1 -> q3 [label=a]
+	q2 [label=q2]
+	q2 -> q4 [label=a]
+	q2 -> q2 [label=b]
+	q3 [label=q3 fillcolor=green style=filled]
+	q3 -> q3 [label=a]
+	q3 -> q2 [label=b]
+	q4 [label=q4 fillcolor=green style=filled]
+	q4 -> q3 [label=a]
+	q4 -> q2 [label=b]
+}
