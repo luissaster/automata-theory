@@ -12,10 +12,10 @@
 # Pedro Augusto Simões da Cruz - 8116 - T1
 # -----------------------------------------------------------------
 
-from automaton import Automaton
+from functions import Automaton, TuringMachine_BinaryIncrement, TuringMachine_BalanceParantheses
 from interface import input_automaton, print_automaton
 from misc import check_equivalence, generate_automaton_image, generate_txt_report, simulate_word
-
+        
 def main():
     """
     Example of how to define an automaton
@@ -35,7 +35,7 @@ def main():
 
     definido = Automaton(states, alphabet, transitions, initial_state, final_states, is_dfa)
     """
-    
+
     automaton_instance = None
     converted_automaton = None
     minimized_automaton = None
@@ -48,6 +48,8 @@ def main():
         print("4. Simulate word acceptance (Inserted and converted automaton)")
         print("5. Check equivalence between automata (Inserted and converted automaton)")
         print("6. Generate .txt file")
+        print("7. Rodar maquina de turing (Incremento de Binário)")
+        print("8. Rodar maquina de turing (Balanceamento de Paranteses)")
         print("\n0. Exit")
         option = input("Choose an option: ")
 
@@ -102,6 +104,16 @@ def main():
                 print("Report generated successfully.")
             else:
                 print("Inserted, converted, or minimized automaton not available.")
+        elif option == "7":
+            input_tape = input("Insira o número binário a ser incrementado: ")
+            tmBinary = TuringMachine_BinaryIncrement(input_tape)
+            tmBinary.run()
+            print("Resultado após incremento:", tmBinary.get_tape())  # Saída esperada: "1110" (14 em binário)
+        elif option == "8":
+            input_tape = input("Insira os parenteses: ")
+            tmBalance = TuringMachine_BalanceParantheses(input_tape)
+            result = tmBalance.run()
+            print("O resultado é:", result)
         elif option == "0":
             print("Exiting...")
             break

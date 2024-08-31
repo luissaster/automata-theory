@@ -1,7 +1,7 @@
 # This file includes functions related to the user interface.
 # That is: input_automaton() and print_automaton()
 
-from automaton import Automaton
+from functions import Automaton
 
 def input_automaton():
     states = input("Enter states separated by commas (e.g.: q0,q1,...): ").split(",")
