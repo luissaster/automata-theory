@@ -2,7 +2,6 @@
 # That is: input_automaton() and print_automaton()
 
 from functions import Automaton
-import json
 
 def input_automaton():
     states = input("Enter states separated by commas (e.g.: q0,q1,...): ").split(",")
@@ -31,27 +30,3 @@ def print_automaton(automaton_instance):
     print(f"Final states: {', '.join(automaton_instance.final_states)}")
     print(f"Is it a DFA: {automaton_instance.is_dfa}")
 
-#def read_turing_machine_from_file(filename):
-    #with open(filename, 'r') as file:
-        #data = json.load(file)
-        #return TuringMachine(data['tape'], data['blank_symbol'], data['initial_state'], data['final_states'], data['transitions'])
-
-# Example of a json file for a Turing Machine:
-# {
-#     "tape": ["0", "1", "0", "1"],
-#     "blank_symbol": "B",
-#     "initial_state": "q0",
-#     "final_states": ["q1"],
-#     "transitions": {
-#         "q0": {
-#             "0": ("q0", "1", "R"),
-#             "1": ("q1", "0", "L"),
-#             "B": ("q0", "B", "R")
-#         },
-#         "q1": {
-#             "0": ("q0", "1", "R"),
-#             "1": ("q1", "0", "L"),
-#             "B": ("q1", "B", "L")
-#         }
-#     }
-# }

@@ -1,8 +1,4 @@
-# This file includes miscellaneous functions used in the program.
-# That is: generate_automaton_image(), simulate_word(), check_equivalence(), generate_txt_report()
-
-import os
-import graphviz
+import os, graphviz
 from itertools import product
 
 def generate_automaton_image(automaton_instance, image_name="automaton_image", image_format="png"):

@@ -15,7 +15,7 @@
 # Pedro Augusto Simões da Cruz - 8116 - T1
 # -----------------------------------------------------------------
 
-from functions import Automaton, TuringMachine_BinaryIncrement, TuringMachine_BalanceParantheses
+from functions import TuringMachine_BinaryIncrement, TuringMachine_BalanceParantheses
 from interface import input_automaton, print_automaton
 from misc import check_equivalence, generate_automaton_image, generate_txt_report, simulate_word
         
@@ -31,8 +31,7 @@ def main():
         print("4. Simulate word acceptance (Inserted and converted automaton)")
         print("5. Check equivalence between automata (Inserted and converted automaton)")
         print("6. Generate .txt file")
-        print("7. Run binary increment Turing machine")
-        print("8. Run parentheses balance Turing machine")
+        print("7. Run Turing Machines")
         print("\n0. Exit")
         option = input("Choose an option: ")
 
@@ -75,20 +74,31 @@ def main():
                 generate_txt_report(automaton, converted_automaton, minimized_automaton)
                 print("Report generated successfully.")
         elif option == "7":
-            input_tape = input("Enter the binary number to be incremented: ")
-            tmBinary = TuringMachine_BinaryIncrement(input_tape)
-            tmBinary.run()
-            print("Result after increment:", tmBinary.get_tape())
-        elif option == "8":
-            input_tape = input("Enter the parentheses: ")
-            tmBalance = TuringMachine_BalanceParantheses(input_tape)
-            result = tmBalance.run()
-            print("The result is:", result)
+            print("\nSelect a Turing Machine to run:")
+            print("1. Binary increment")
+            print("2. Parentheses balance")
+            
+            tm_option = input("Choose an option: ")
+
+            if tm_option == "1":
+                input_tape = input("Enter the binary number to be incremented: ")
+                tmBinary = TuringMachine_BinaryIncrement(input_tape)
+                tmBinary.run()
+                print("Result after increment:", tmBinary.get_tape())
+            elif tm_option == "2":
+                input_tape = input("Enter the parentheses: ")
+                tmBalance = TuringMachine_BalanceParantheses(input_tape)
+                result = tmBalance.run()
+                print("The result is:", result)
+            else:
+                print("Invalid option. Try again.")
+
         elif option == "0":
             print("Exiting...")
             break
         else:
             print("Invalid option. Try again.")
+
 
 if __name__ == "__main__":
     main()
