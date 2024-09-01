@@ -1,17 +1,17 @@
-# This file includes miscellaneous functions used in the program.
-# That is: generate_automaton_image(), simulate_word(), check_equivalence(), generate_txt_report()
-
-import os
-import graphviz
+import os, graphviz
 from itertools import product
 
 def generate_automaton_image(automaton_instance, image_name="automaton_image", image_format="png"):
     dot = graphviz.Digraph()
     for state in automaton_instance.states:
         if state in automaton_instance.final_states:
-            dot.node(state, state, style='filled', fillcolor='green')
+            dot.node(state, state, shape='doublecircle', style='filled', fillcolor='green')
         else:
             dot.node(state, state)
+    dot.node('start', shape='point', height='0', width='0')
+    dot.edge('start', automaton_instance.initial_state, arrowhead='vee')
+
+    for state in automaton_instance.states:
         for symbol in automaton_instance.alphabet:
             next_states = automaton_instance.transitions[state].get(symbol, [])
             for next_state in next_states:
@@ -26,6 +26,7 @@ def generate_automaton_image(automaton_instance, image_name="automaton_image", i
     # Cleanup = True
     output_path = dot.render(filename=os.path.join(output_dir, image_name), format=image_format, view=True, cleanup=True)
     print(f"Graph saved as {output_path}")
+
 
 def simulate_word(automaton_instance, word):
     current_states = {automaton_instance.initial_state}
