@@ -33,13 +33,14 @@ class Automaton:
                 for state in current_state:
                     next_states.update(self.get_next_states(state, symbol))
 
-                next_state = frozenset(next_states)
+                if next_states:
+                    next_state = frozenset(next_states)
 
-                if next_state not in dfa_states:
-                    dfa_states.append(next_state)
-                    queue.append(next_state)
+                    if next_state not in dfa_states:
+                        dfa_states.append(next_state)
+                        queue.append(next_state)
 
-                dfa_transitions[current_state][symbol] = next_state
+                    dfa_transitions[current_state][symbol] = next_state
 
             # Check for final states
             if current_state & set(self.final_states):
@@ -59,6 +60,7 @@ class Automaton:
             final_states=list(final_states_named),
             is_dfa=True
         )
+
     
     def minimize_dfa(self):
         if not self.is_dfa:
@@ -71,8 +73,8 @@ class Automaton:
         while queue:
             state = queue.pop(0)
             for symbol in self.alphabet:
-                next_state = self.transitions[state][symbol]
-                if next_state not in reachable_states:
+                next_state = self.transitions.get(state, {}).get(symbol, None)
+                if next_state is not None and next_state not in reachable_states:
                     reachable_states.add(next_state)
                     queue.append(next_state)
         
@@ -88,7 +90,7 @@ class Automaton:
             for group in partition:
                 grouped_states = {}
                 for state in group:
-                    signature = tuple(sorted([(symbol, self.transitions[state][symbol]) for symbol in self.alphabet]))
+                    signature = tuple(sorted([(symbol, self.transitions.get(state, {}).get(symbol, None)) for symbol in self.alphabet]))
                     if signature not in grouped_states:
                         grouped_states[signature] = set()
                     grouped_states[signature].add(state)
@@ -107,8 +109,9 @@ class Automaton:
         for group in partition:
             representative = next(iter(group))
             for symbol in self.alphabet:
-                next_state = self.transitions[representative][symbol]
-                minimized_transitions[str(state_map[representative])][symbol] = str(state_map[next_state])
+                next_state = self.transitions.get(representative, {}).get(symbol, None)
+                if next_state is not None:
+                    minimized_transitions[str(state_map[representative])][symbol] = str(state_map[next_state])
 
         return Automaton(
             states=minimized_states,
