@@ -14,7 +14,6 @@ class Automaton:
         return next_states
     
     def convert_to_dfa(self):
-        # Initialize DFA components
         dfa_states = []
         dfa_transitions = {}
         initial_state = frozenset([self.initial_state])
@@ -122,88 +121,83 @@ class Automaton:
 
 class TuringMachine_BinaryIncrement:
     def __init__(self, tape, blank_symbol="B"):
-        # Fita de entrada inicial com símbolos de branco nas extremidades
         self.tape = list(tape) + [blank_symbol]
         self.blank_symbol = blank_symbol
-        self.head_position = len(tape) - 1  # Começa na última posição da fita
-        self.current_state = "q0"  # Estado inicial
+        self.head_position = len(tape) - 1          # Start at the last position of the tape
+        self.current_state = "q0"  
         self.transitions = self._define_transitions()
 
     def _define_transitions(self):
-        # Definindo as regras de transição para a máquina de Turing
         return {
-            ("q0", "1"): ("q0", "0", "L"),  # Troque '1' por '0' e continue para a esquerda
-            ("q0", "0"): ("q1", "1", "R"),  # Troque '0' por '1' e mude para o estado final
-            ("q0", "B"): ("q1", "1", "R"),  # Se chegar ao início da fita, adicione '1'
+            ("q0", "1"): ("q0", "0", "L"),          # Replace '1' with '0' and go to the left
+            ("q0", "0"): ("q1", "1", "R"),          # Replace '0' with '1' and go to the final state
+            ("q0", "B"): ("q1", "1", "R"),          # If you reach the beginning of the tape, add '1'
         }
 
     def step(self):
-        # Executa um passo da máquina de Turing
         current_symbol = self.tape[self.head_position]
         if (self.current_state, current_symbol) in self.transitions:
             new_state, write_symbol, direction = self.transitions[(self.current_state, current_symbol)]
-            self.tape[self.head_position] = write_symbol  # Escreve o símbolo
-            self.current_state = new_state  # Atualiza o estado
-            self.head_position += 1 if direction == "R" else -1  # Move o cabeçote
+            self.tape[self.head_position] = write_symbol            # Write the symbol
+            self.current_state = new_state                          # Update the state
+            self.head_position += 1 if direction == "R" else -1     # Move the head
 
     def run(self):
-        # Executa a máquina até atingir o estado de parada 'q1'
         while self.current_state != "q1":
             self.step()
 
     def get_tape(self):
-        # Retorna o conteúdo atual da fita
         return "".join(self.tape).rstrip(self.blank_symbol)
 
 class TuringMachine_BalanceParantheses:
     def __init__(self, tape, blank_symbol="B"):
-        # Inicializa a fita e a máquina de Turing
         self.tape = list(tape) + [blank_symbol]
         self.blank_symbol = blank_symbol
-        self.head_position = 0  # Cabeçote começa na primeira posição da fita
-        self.current_state = "q0"  # Estado inicial
+        self.head_position = 0                      # Start at the first position of the tape
+        self.current_state = "q0" 
         self.transitions = self._define_transitions()
 
     def _define_transitions(self):
-        # Definindo as regras de transição para a máquina de Turing
         return {
-            # Estado q0: Procura o próximo '(' para marcar
-            ("q0", "("): ("q1", "X", "R"),  # Marca '(' como 'X' e move para a direita
-            ("q0", "X"): ("q0", "X", "R"),  # Ignora 'X' e continua para a direita
-            ("q0", "Y"): ("q0", "Y", "R"),  # Ignora 'Y' e continua para a direita
-            ("q0", ")"): ("q_reject", ")", "R"),  # Rejeita se ')' não tiver um '(' correspondente
-            ("q0", "B"): ("q_accept", "B", "R"),  # Aceita se chegar ao fim sem parênteses desbalanceados
+
+            # State q0: Search for the next '(' to mark
+
+            ("q0", "("): ("q1", "X", "R"),          # Mark '(' as 'X' and move right
+            ("q0", "X"): ("q0", "X", "R"),          # Ignore 'X' and continue right
+            ("q0", "Y"): ("q0", "Y", "R"),          # Ignore 'Y' and continue right
+            ("q0", ")"): ("q_reject", ")", "R"),    # Reject if ')' doesn't have a corresponding '('
+            ("q0", "B"): ("q_accept", "B", "R"),    # Accept if there are no unbalanced parentheses at the end
             
-            # Estado q1: Procura o próximo ')' para marcar
-            ("q1", "("): ("q1", "(", "R"),  # Ignora '(' e continua para a direita
-            ("q1", "X"): ("q1", "X", "R"),  # Ignora 'X' e continua para a direita
-            ("q1", "Y"): ("q1", "Y", "R"),  # Ignora 'Y' e continua para a direita
-            ("q1", ")"): ("q2", "Y", "L"),  # Marca ')' como 'Y' e volta para a esquerda
-            ("q1", "B"): ("q_reject", "B", "L"),  # Rejeita se não encontrar um ')'
+            # State q1: Search for the next ')' to mark
+
+            ("q1", "("): ("q1", "(", "R"),          # Ignore '(' and continue right
+            ("q1", "X"): ("q1", "X", "R"),          # Ignore 'X' and continue right
+            ("q1", "Y"): ("q1", "Y", "R"),          # Ignore 'Y' and continue right
+            ("q1", ")"): ("q2", "Y", "L"),          # Mark ')' as 'Y' and go back to the left
+            ("q1", "B"): ("q_reject", "B", "L"),    # Reject if there is no ')' to mark
             
-            # Estado q2: Retorna ao início para procurar o próximo '('
-            ("q2", "("): ("q2", "(", "L"),  # Move para a esquerda sobre '('
-            ("q2", ")"): ("q2", ")", "L"),  # Move para a esquerda sobre ')'
-            ("q2", "X"): ("q0", "X", "R"),  # Retorna ao estado q0 ao encontrar um 'X'
-            ("q2", "Y"): ("q2", "Y", "L"),  # Move para a esquerda sobre 'Y'
+            # State q2: Go back to the beginning to search for the next '('
+
+            ("q2", "("): ("q2", "(", "L"),          # Go back to the left over '('
+            ("q2", ")"): ("q2", ")", "L"),          # Go back to the left over ')'
+            ("q2", "X"): ("q0", "X", "R"),          # Go back to state q0 when you find an 'X'
+            ("q2", "Y"): ("q2", "Y", "L"),          # Go back to the left over 'Y'
+
         }
 
     def step(self):
-        # Executa um passo da máquina de Turing
         current_symbol = self.tape[self.head_position]
         if (self.current_state, current_symbol) in self.transitions:
             new_state, write_symbol, direction = self.transitions[(self.current_state, current_symbol)]
-            self.tape[self.head_position] = write_symbol  # Escreve o símbolo
-            self.current_state = new_state  # Atualiza o estado
-            self.head_position += 1 if direction == "R" else -1  # Move o cabeçote
+            self.tape[self.head_position] = write_symbol            # Write the symbol
+            self.current_state = new_state                          # Update the state
+            self.head_position += 1 if direction == "R" else -1     # Move the head
 
     def run(self):
-        # Executa a máquina até atingir um estado de aceitação ou rejeição
         while self.current_state not in ["q_accept", "q_reject"]:
             self.step()
         return self.current_state == "q_accept"
 
     def get_tape(self):
-        # Retorna o conteúdo atual da fita
         return "".join(self.tape).rstrip(self.blank_symbol)
 
