@@ -2,33 +2,35 @@ Automaton 1:
 States: q0, q1, q2
 Alphabet: a, b
 Transitions:
-  q0 --a--> q1
-  q0 --b--> q1
-  q1 --a--> q0
-  q1 --b--> q1
+  q0 --a--> q1, q0
+  q0 --b--> q2
+  q1 --a--> 
+  q1 --b--> q2
   q2 --a--> q0
-  q2 --b--> q0
+  q2 --b--> q2
 Initial State: q0
-Final States: q0
+Final States: q2
 
 Automaton 2:
-States: 1, 0
+States: 0, 2, 1
 Alphabet: a, b
 Transitions:
-  1 --a--> 0
-  1 --b--> 1
   0 --a--> 1
-  0 --b--> 1
+  0 --b--> 2
+  2 --a--> 0
+  2 --b--> 2
+  1 --a--> 1
+  1 --b--> 2
 Initial State: 0
-Final States: 0
+Final States: 2
 
 Minimized Automaton:
 States: 0, 1
 Alphabet: a, b
 Transitions:
   0 --a--> 1
-  0 --b--> 1
-  1 --a--> 0
-  1 --b--> 1
-Initial State: 0
+  0 --b--> 0
+  1 --a--> 1
+  1 --b--> 0
+Initial State: 1
 Final States: 0

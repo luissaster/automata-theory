@@ -8,15 +8,28 @@ class AutomatonApp:
     def __init__(self, root):
         self.root = root
         self.root.title("GUI")
-        self.root.geometry("360x360")
+        self.root.geometry("400x400")
+
+        self.testAutomaton = Automaton(
+            states=['q0', 'q1', 'q2'],
+            initial_state='q0',
+            final_states=['q2'],
+            alphabet=['a', 'b'],
+            transitions={
+                'q0': {'a': ['q0', 'q1'], 'b':['q2']},  # On 'a', q0 can stay in q0 or move to q1
+                'q1': {'b': ['q2']},        # On 'b', q1 moves to q2
+                'q2': {'a': ['q0'], 'b': ['q2']}  # q2 loops on 'a' or 'b'
+            },
+            is_dfa=False  # Indicating it's an NFA
+        )
 
         self.automaton = None
         self.converted_automaton = None
         self.minimized_automaton = None
-
         self.create_widgets()
 
     def create_widgets(self):
+        tk.Button(self.root, text="Run Test Automaton", command=self.run_test_automaton).pack(pady=10)
         tk.Button(self.root, text="Insert Automaton", command=self.insert_automaton).pack(pady=10)
         tk.Button(self.root, text="Convert to DFA", command=self.convert_to_dfa).pack(pady=10)
         tk.Button(self.root, text="Minimize DFA", command=self.minimize_dfa).pack(pady=10)
@@ -25,6 +38,13 @@ class AutomatonApp:
         tk.Button(self.root, text="Generate .txt File", command=self.generate_txt_file).pack(pady=10)
         tk.Button(self.root, text="Run Turing Machines", command=self.run_turing_machines).pack(pady=10)
 
+    def run_test_automaton(self):
+        self.show_automaton(self.testAutomaton)
+        generate_automaton_image(self.testAutomaton, image_name="inserted_automaton")
+        self.automaton = self.testAutomaton
+        self.convert_to_dfa()
+        self.minimize_dfa()
+    
     def insert_automaton(self):
         states = simpledialog.askstring("Input", "Enter states separated by commas (e.g.: q0,q1,...):").split(",")
         alphabet = simpledialog.askstring("Input", "Enter alphabet separated by commas (e.g.: a,b,...):").split(",")
@@ -39,7 +59,7 @@ class AutomatonApp:
         is_dfa = simpledialog.askstring("Input", "Is it a DFA (Deterministic Finite Automaton)?\nY for yes, N for no:").lower() == "y"
         self.automaton = Automaton(states, alphabet, transitions, initial_state, final_states, is_dfa)
         self.show_automaton(self.automaton)
-        generate_automaton_image(self.automaton, image_name="inserted_automaton")
+        generate_automaton_image(self.automaton, image_name="inserted_automaton") 
 
     def convert_to_dfa(self):
         if self.automaton:
@@ -117,7 +137,6 @@ class AutomatonApp:
         info += f"Final states: {', '.join(automaton_instance.final_states)}\n"
         info += f"Is it a DFA: {automaton_instance.is_dfa}\n"
         messagebox.showinfo("Automaton Information", info)
-
 
 if __name__ == "__main__":
     root = tk.Tk()

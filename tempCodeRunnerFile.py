@@ -1,0 +1,1 @@
+states, alphabet, transitions, initial_state, final_states, blank_symbol
