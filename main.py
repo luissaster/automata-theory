@@ -16,11 +16,11 @@ class AutomatonApp:
             final_states=['q2'],
             alphabet=['a', 'b'],
             transitions={
-                'q0': {'a': ['q0', 'q1'], 'b':['q2']},  # On 'a', q0 can stay in q0 or move to q1
-                'q1': {'b': ['q2']},        # On 'b', q1 moves to q2
-                'q2': {'a': ['q0'], 'b': ['q2']}  # q2 loops on 'a' or 'b'
+                'q0': {'a': ['q0', 'q1'], 'b':['q2']},  
+                'q1': {'b': ['q2']},        
+                'q2': {'a': ['q0'], 'b': ['q2']}
             },
-            is_dfa=False  # Indicating it's an NFA
+            is_dfa=False  
         )
 
         self.automaton = None
